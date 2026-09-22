@@ -1,47 +1,42 @@
 import os
-import json
 import requests
 
-def send_slack_notification():
-    # Retrieve Slack Webhook URL from environment variables
-    webhook_url = os.getenv("SLACK_WEBHOOK_URL")
-    if not webhook_url:
-        print("SLACK_WEBHOOK_URL variable is missing.")
-        return
+webhook_url = os.environ.get("SLACK_WEBHOOK_URL")
+repository = os.environ.get("GITHUB_REPOSITORY") 
+workflow_status = os.environ.get("WORKFLOW_STATUS", "success")
 
-    # GITHUB_REPOSITORY is automatically set by GitHub Actions as 'owner/repo' (e.g., 'jjustgray/playwright_pytest')
-    github_repository = os.getenv("GITHUB_REPOSITORY", "jjustgray/playwright_pytest")
-    
-    # Parse owner and repo name to construct GitHub Pages URL
-    try:
-        user_name, repo_name = github_repository.split("/")
-    except ValueError:
-        print(f"Invalid GITHUB_REPOSITORY format: {github_repository}")
-        return
+if not webhook_url:
+    print("Error: SLACK_WEBHOOK_URL is not provided.")
+    exit(1)
 
-    gh_pages_url = f"https://{user_name}.github.io/{repo_name}/"
+# Формирование ссылки на GitHub Pages
+if repository:
+    owner, repo_name = repository.split("/")
+    gh_pages_url = f"https://{owner}.github.io/{repo_name}/"
+else:
+    gh_pages_url = "https://github.com"
 
-    # Construct Slack message payload
-    payload = {
-        "text": "*Automation Exercise E2E Test Execution Results*",
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"🚀 *UI Test Execution Finished!*\n\n📊 *Allure Report*: <{gh_pages_url}|Open GitHub Pages Report>"
-                }
+# Определение статуса для сообщения
+status_icon = "🟢 Passed" if workflow_status == "success" else "🔴 Failed"
+
+payload = {
+    "blocks": [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"*Playwright + Pytest E2E Test Execution*\n*Status:* {status_icon}"
             }
-        ]
-    }
+        },
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": f"📊 *Allure Report:* <{gh_pages_url}|View Report on GitHub Pages>"
+            }
+        }
+    ]
+}
 
-    # Send POST request to Slack Webhook URL
-    response = requests.post(
-        webhook_url, 
-        data=json.dumps(payload),
-        headers={'Content-Type': 'application/json'}
-    )
-    print(f"Slack notification status: {response.status_code}")
-
-if __name__ == "__main__":
-    send_slack_notification()
+response = requests.post(webhook_url, json=payload)
+print(f"Slack Notification Status: {response.status_code}")

@@ -19,7 +19,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Playwright supports chromium, firefox, and webkit natively
         browser: [chromium, firefox, webkit]
 
     steps:
@@ -39,8 +38,6 @@ jobs:
           playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run Pytest Tests
-        # -n 2 runs tests in parallel using pytest-xdist
-        # || true allows the pipeline to proceed to artifact uploading even if tests fail
         run: |
           python -m pytest -n 2 --browser ${{ matrix.browser }} --alluredir=allure-results || true
 
@@ -112,5 +109,8 @@ jobs:
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          WORKFLOW_STATUS: ${{ needs.test.result }}
         run: |
           python utils/slack_notifier.py
