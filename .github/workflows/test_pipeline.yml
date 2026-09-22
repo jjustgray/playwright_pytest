@@ -1,8 +1,10 @@
-name: UI Automation Pipeline
+name: E2E Automation Pipeline (Playwright + Pytest)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:
 
 permissions:
@@ -11,10 +13,53 @@ permissions:
   id-token: write
 
 jobs:
-  test-and-deploy:
+  test:
+    name: Run Tests on ${{ matrix.browser }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Playwright supports chromium, firefox, and webkit natively
+        browser: [chromium, firefox, webkit]
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Run Pytest Tests
+        # -n 2 runs tests in parallel using pytest-xdist
+        # || true allows the pipeline to proceed to artifact uploading even if tests fail
+        run: |
+          python -m pytest -n 2 --browser ${{ matrix.browser }} --alluredir=allure-results || true
+
+      - name: Upload Allure Results Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.browser }}
+          path: allure-results/
+          retention-days: 1
+
+  publish-report:
+    name: Generate & Publish Allure Report & Notify Slack
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -22,24 +67,32 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
+      - name: Install Python Dependencies
         run: |
-          pip install -r requirements.txt
-          playwright install --with-deps
+          python -m pip install --upgrade pip
+          pip install requests
 
-      - name: Run Playwright Tests
+      - name: Download All Results Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-results-*
+          path: merged-allure-results
+          merge-multiple: true
+
+      - name: Move Merged Results
         run: |
-          pytest -n 2 --browser chromium --alluredir=allure-results || true
+          mkdir -p allure-results
+          cp -r merged-allure-results/* allure-results/ || true
 
-      - name: Get Allure history
+      - name: Download Allure Report History from gh-pages
         uses: actions/checkout@v4
         if: always()
         continue-on-error: true
         with:
           ref: gh-pages
-          path: gh-pages
+          path: gh-pages-dir
 
-      - name: Generate Allure Report
+      - name: Generate Allure Report with History
         uses: simple-elf/allure-report-action@v1.7
         if: always()
         with:
@@ -47,13 +100,13 @@ jobs:
           allure_history: allure-history
           keep_reports: 20
 
-      - name: Deploy Allure Report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         if: always()
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./allure-history
-          publish_branch: gh-pages
+          keep_files: false
 
       - name: Send Slack Notification
         if: always()

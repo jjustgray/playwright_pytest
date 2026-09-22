@@ -8,13 +8,13 @@ class TestCasesSuite:
 
     @allure.story("Проверка видимости списка всех тест-кейсов")
     @allure.severity(allure.severity_level.CRITICAL)
-    def test_verify_test_cases_page_loaded(self, page):
-        test_cases_page = TestCasesPage(page)
+    def test_verify_testCasesPage_loaded(self, page):
+        testCasesPage = TestCasesPage(page)
         
-        test_cases_page.navigate()
-        test_cases_page.verify_page_loaded()
+        testCasesPage.navigate()
+        testCasesPage.verify_page_loaded()
         
-        count = test_cases_page.get_test_cases_count()
+        count = testCasesPage.get_test_cases_count()
         assert count > 0, "Список тест-кейсов пуст!"
 
     @pytest.mark.parametrize("case_index, expected_title", [
@@ -24,6 +24,6 @@ class TestCasesSuite:
     ])
     @allure.story("Параметризованная проверка структуры тест-кейсов")
     def test_verify_individual_test_case(self, page, case_index, expected_title):
-        test_cases_page = TestCasesPage(page)
-        test_cases_page.navigate()
-        test_cases_page.expand_test_case(case_index, expected_title)
+        testCasesPage = TestCasesPage(page)
+        testCasesPage.navigate()
+        testCasesPage.expand_test_case(case_index, expected_title)
