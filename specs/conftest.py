@@ -9,17 +9,18 @@ from pages.signup_page import SignupPage
 
 
 @pytest.fixture(scope="session")
-def browser_type_launch_args(browser_type_launch_args):
-    return {
-        **browser_type_launch_args,
-        "args": [
-            "--disable-features=Translate,TranslateUI",
-            "--disable-translate",
-            "--disable-extensions",
-            "--lang=en-US",
-        ],
-    }
-
+def browser_type_launch_args(browser_type_launch_args, browser_name):
+    if browser_name == "chromium":
+        return {
+            **browser_type_launch_args,
+            "args": [
+                "--disable-features=Translate,TranslateUI",
+                "--disable-translate",
+                "--disable-extensions",
+                "--lang=en-US",
+            ],
+        }
+    return browser_type_launch_args
 
 @pytest.fixture(scope="session")
 def browser_context_args(browser_context_args):
