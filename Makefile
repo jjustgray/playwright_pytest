@@ -1,6 +1,6 @@
-# Run all tests in parallel (4 threads) on Chromium
+# Run all tests in parallel (2 threads) on Chromium
 test:
-	python -m pytest -n 4 --browser chromium
+	python -m pytest -n 2 --browser chromium --headed
 
 # Run all tests sequentially across all 3 browsers
 test-all-browsers:
