@@ -1,12 +1,14 @@
 import time
 import allure
 import pytest
+import re
 from playwright.sync_api import Page, expect
 import requests
 
 from pages.login_page import LoginPage
 from pages.main_page import MainPage
 from pages.signup_page import SignupPage
+from pages.contactus_page import ContactUsPage
 
 
 @pytest.fixture(scope="session")
@@ -56,33 +58,36 @@ def pytest_runtest_makereport(item, call):
 
 @pytest.fixture(autouse=True)
 def block_ads(page: Page):
-    ad_patterns = [
-        "**/*googleads*",
-        "**/*pagead*",
-        "**/*doubleclick*",
-        "**/*adservice*",
-        "**/zrt_lookup_*",
-        "**/*googlesyndication*",
-    ]
-    for pattern in ad_patterns:
-        page.route(pattern, lambda route: route.abort())
+    page.route(
+        re.compile(
+            r".*(googleads|pagead2|doubleclick|googlesyndication|adservice|adsystem).*"),
+        lambda route: route.abort()
+    )
 
     page.add_init_script("""
         const style = document.createElement('style');
         style.innerHTML = `
-            ins.adsbygoogle, 
             iframe[id^="aswift_"], 
-            [id^="google_ads"], 
-            #click-protector,
-            .grippy-host {
+            iframe[src*="googleads"], 
+            div[id^="google_ads"], 
+            .adsbygoogle, 
+            #dismiss-button, 
+            .grippy-host,
+            [aria-label="Advertisement"],
+            #google_esf {
                 display: none !important;
                 visibility: hidden !important;
                 pointer-events: none !important;
-                height: 0 !important;
-                width: 0 !important;
+                width: 0px !important;
+                height: 0px !important;
             }
         `;
         document.head.appendChild(style);
+
+        setInterval(() => {
+            const vignettes = document.querySelectorAll('iframe[src*="googleads"], #dismiss-button');
+            vignettes.forEach(el => el.remove());
+        }, 500);
     """)
 
 
@@ -131,6 +136,11 @@ def login_page(page: Page) -> LoginPage:
 @pytest.fixture
 def signup_page(page: Page) -> SignupPage:
     return SignupPage(page)
+
+
+@pytest.fixture
+def contactus_page(page: Page) -> ContactUsPage:
+    return ContactUsPage(page)
 
 
 @pytest.fixture

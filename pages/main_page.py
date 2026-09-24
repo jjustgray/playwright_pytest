@@ -24,6 +24,10 @@ class MainPage(BasePage):
         )
         self.logout_button = page.locator(
             "ul.navbar-nav").get_by_role("link", name="Logout")
+        self.contactus_button = page.locator(
+            "ul.navbar-nav").get_by_role("link", name=" Contact us")
+        self.home_button = page.locator(
+            "ul.navbar-nav").get_by_role("link", name=" Home")
 
     @allure.step("Click on Signup / Login button")
     def click_signup_login_button(self):
@@ -41,3 +45,11 @@ class MainPage(BasePage):
     @allure.step("Click Logout button")
     def click_logout_button(self):
         self.click_with_retry_on_overload(self.logout_button)
+
+    @allure.step("Click Contact Us button")
+    def click_contactus_button(self):
+        self.click_with_retry_on_overload(self.contactus_button)
+
+    @allure.step("Click Home button")
+    def click_home_button(self):
+        self.click_with_retry_on_overload(self.home_button)

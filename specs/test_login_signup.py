@@ -110,7 +110,6 @@ class TestLoginSignup:
         self,
         login_page: LoginPage,
         registered_user: dict,
-        page: Page
     ):
         expect(login_page.signup_heading).to_be_visible()
         login_page.fill_signup_form(
