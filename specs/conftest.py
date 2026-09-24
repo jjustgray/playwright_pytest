@@ -1,7 +1,8 @@
 import time
 import allure
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
+import requests
 
 from pages.login_page import LoginPage
 from pages.main_page import MainPage
@@ -130,3 +131,42 @@ def login_page(page: Page) -> LoginPage:
 @pytest.fixture
 def signup_page(page: Page) -> SignupPage:
     return SignupPage(page)
+
+
+@pytest.fixture
+def start_login_signup_flow(main_page: MainPage, login_page: LoginPage):
+    expect(main_page.slider_section).to_be_visible()
+    main_page.click_signup_login_button()
+    expect(login_page.signup_heading).to_be_visible()
+
+
+@pytest.fixture
+def registered_user():
+    user_data = {
+        "name": "TestUser",
+        "email": "test_login_user_123@example.com",
+        "password": "Password123!",
+        "title": "Mr",
+        "birth_date": "1",
+        "birth_month": "January",
+        "birth_year": "2000",
+        "firstname": "Test",
+        "lastname": "User",
+        "company": "QA Company",
+        "address1": "Street 1",
+        "address2": "Apt 2",
+        "country": "United States",
+        "zipcode": "10001",
+        "state": "State",
+        "city": "City",
+        "mobile_number": "1234567890"
+    }
+
+    response = requests.post(
+        "https://automationexercise.com/api/createAccount",
+        data=user_data
+    )
+
+    assert response.status_code == 200
+
+    yield user_data

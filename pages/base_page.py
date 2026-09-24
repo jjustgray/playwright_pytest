@@ -1,6 +1,7 @@
 import time
 from playwright.sync_api import Page, Locator, expect
 
+
 class BasePage:
     def __init__(self, page: Page):
         self.page = page
@@ -23,6 +24,7 @@ class BasePage:
                     time.sleep(2)
                     self.page.reload()
                 else:
-                    raise Exception("The website is under heavy load and did not recover after several attempts.")
+                    raise Exception(
+                        "The website is under heavy load and did not recover after several attempts.")
             else:
                 break
