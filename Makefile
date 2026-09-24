@@ -2,6 +2,10 @@
 test:
 	python -m pytest -n 2 --browser chromium --headed
 
+# Run certain spec test-suit with logs (-v) in open browser mode (--headed) with slow execution(--slowmo 1000)
+test-suit:
+	pytest specs/test_contactus.py -v --headed --slowmo 1000
+
 # Run all tests sequentially across all 3 browsers
 test-all-browsers:
 	python -m pytest --browser chromium --browser firefox --browser webkit
