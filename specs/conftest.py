@@ -22,6 +22,7 @@ def browser_type_launch_args(browser_type_launch_args, browser_name):
         }
     return browser_type_launch_args
 
+
 @pytest.fixture(scope="session")
 def browser_context_args(browser_context_args):
     return {
@@ -38,15 +39,18 @@ def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
 
-    if report.when == "call" and report.failed:
+    if report.failed and report.when in ("setup", "call"):
         page: Page = item.funcargs.get("page")
-        if page:
-            screenshot = page.screenshot(full_page=True)
-            allure.attach(
-                screenshot,
-                name="failure_screenshot",
-                attachment_type=allure.attachment_type.PNG,
-            )
+        if page and not page.is_closed():
+            try:
+                screenshot = page.screenshot(full_page=True, timeout=5000)
+                allure.attach(
+                    screenshot,
+                    name=f"failure_screenshot_{report.when}",
+                    attachment_type=allure.attachment_type.PNG,
+                )
+            except Exception as e:
+                print(f"Не удалось сделать скриншот: {e}")
 
 
 @pytest.fixture(autouse=True)
