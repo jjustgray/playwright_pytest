@@ -24,6 +24,7 @@ class TestLoginSignup:
         username = "Jimmy"
         user_email = f"jimmy_{int(time.time())}@example.com"
 
+        expect(login_page.signup_heading).to_be_visible()
         login_page.fill_signup_form(username, user_email)
         login_page.click_signup_button()
         expect(signup_page.signup_heading).to_be_visible()

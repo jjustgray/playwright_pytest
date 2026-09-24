@@ -137,7 +137,6 @@ def signup_page(page: Page) -> SignupPage:
 def start_login_signup_flow(main_page: MainPage, login_page: LoginPage):
     expect(main_page.slider_section).to_be_visible()
     main_page.click_signup_login_button()
-    expect(login_page.signup_heading).to_be_visible()
 
 
 @pytest.fixture
