@@ -21,13 +21,13 @@ Automation testing framework for the [Automation Exercise](https://www.automatio
 
 ## 👉 Quick Start (Local)
 
-* 1. Clone the repository
+1. Clone the repository
 ```
 git clone https://github.com/jjustgray/playwright_pytest.git
 cd playwright_pytest
 ```
 
-* 2. Set up virtual environment and install dependencies
+2. Set up virtual environment and install dependencies
 post-create: 
 ```
 python -m venv .venv
