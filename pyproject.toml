@@ -1,0 +1,24 @@
+[tool.poe.tasks]
+# Run all tests in headless mode with 4 parallel workers
+test = "pytest -n 4 --alluredir=allure-results"
+
+# Run tests with browser UI enabled (Headed mode)
+test-headed = "pytest --headed --slowmo 500 --alluredir=allure-results"
+
+# Run a specific test file (Usage: poe test-file specs/test_contactus.py)
+test-file = "pytest --headed --slowmo 1000 --alluredir=allure-results"
+
+# Run tests in a specific browser (Usage: poe test-browser --browser firefox)
+test-browser = "pytest --alluredir=allure-results"
+
+# Run smoke tests only
+test-smoke = "pytest -m smoke --alluredir=allure-results"
+
+# Run tests sequentially across all three supported browsers
+test-all-browsers = "pytest --browser chromium --browser firefox --browser webkit --alluredir=allure-results"
+
+# Generate and open Allure report locally using npx
+serve-report = "npx allure serve allure-results < /dev/null"
+
+# Clean up report directories, pytest cache, and Python bytecode files
+clean = "python -c \"import shutil, os; [shutil.rmtree(p, ignore_errors=True) for p in ['allure-results', 'allure-report', '.pytest_cache', '__pycache__']]\""
