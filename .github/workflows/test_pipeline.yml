@@ -25,21 +25,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Node.js Dependencies
+        run: npm ci
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      - name: Install Dependencies
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Run Pytest Tests
+      - name: Run Pytest Tests via Poe
         run: |
-          python -m pytest -n 2 --browser ${{ matrix.browser }} --alluredir=allure-results || true
+          poe test-browser --browser ${{ matrix.browser }} --alluredir=allure-results || true
 
       - name: Upload Allure Results Artifact
         if: always()
