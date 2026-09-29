@@ -4,6 +4,7 @@ import allure
 from playwright.sync_api import Page, expect
 
 from pages.cart_page import CartPage
+from pages.login_page import LoginPage
 from pages.main_page import MainPage
 from pages.products_page import ProductsPage
 
@@ -86,4 +87,64 @@ class TestCart:
         expect(cart_page.product_rows).to_have_count(2)
         cart_page.remove_product(1)
         expect(cart_page.product_row(1)).to_have_count(0)
+        expect(cart_page.product_rows).to_have_count(1)
+
+    @allure.story("TC-20: Search Products and Verify Cart After Login")
+    def test_search_products_and_verify_cart_after_login(
+        self,
+        main_page: MainPage,
+        products_page: ProductsPage,
+        cart_page: CartPage,
+        login_page: LoginPage,
+        registered_order_user: dict,
+        page: Page,
+    ):
+        search_term = "Top"
+        main_page.click_products_button()
+        expect(page).to_have_url(re.compile(r".*/products/?$"))
+        expect(products_page.all_products_heading).to_be_visible()
+
+        products_page.search_product(search_term)
+        expect(products_page.searched_products_heading).to_be_visible()
+        product_count = products_page.product_cards.count()
+        assert product_count > 0
+        for index in range(product_count):
+            expect(products_page.product_cards.nth(index)).to_be_visible()
+            products_page.add_product_to_cart(index)
+            if index < product_count - 1:
+                products_page.continue_shopping()
+
+        products_page.view_cart_from_modal()
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(product_count)
+        expect(cart_page.product_rows.first).to_be_visible()
+
+        main_page.click_signup_login_button()
+        expect(login_page.login_heading).to_be_visible()
+        login_page.fill_login_form(
+            registered_order_user["email"],
+            registered_order_user["password"],
+        )
+        login_page.click_login_button()
+        expect(main_page.logged_in_as_text).to_be_visible()
+
+        main_page.click_cart_button()
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(product_count)
+        expect(cart_page.product_rows.first).to_be_visible()
+
+    @allure.story("TC-22: Add to Cart from Recommended Items")
+    def test_add_recommended_product_to_cart(
+        self,
+        products_page: ProductsPage,
+        cart_page: CartPage,
+        page: Page,
+    ):
+        expect(products_page.recommended_items).to_be_visible()
+        expect(products_page.recommended_product_cards.first).to_be_visible()
+
+        products_page.add_recommended_product_to_cart()
+        products_page.view_cart_from_modal()
+
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
         expect(cart_page.product_rows).to_have_count(1)

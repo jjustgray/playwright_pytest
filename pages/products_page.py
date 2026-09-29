@@ -29,6 +29,32 @@ class ProductsPage(BasePage):
         self.view_cart_button = self.cart_modal.get_by_role(
             "link", name="View Cart")
 
+        self.category_sidebar = page.locator(
+            ".left-sidebar .category-products")
+        self.women_category = self.category_sidebar.locator(
+            'a[href="#Women"]')
+        self.men_category = self.category_sidebar.locator(
+            'a[href="#Men"]')
+        self.women_subcategories = page.locator("#Women")
+        self.men_subcategories = page.locator("#Men")
+        self.brands_sidebar = page.locator(".left-sidebar .brands-name")
+        self.brand_links = self.brands_sidebar.locator("li a")
+        self.brand_products_heading = page.locator(
+            ".features_items h2.title")
+        self.review_form = page.locator("#review-form")
+        self.review_heading = page.get_by_role(
+            "link", name="Write Your Review", exact=True)
+        self.review_name_input = self.review_form.locator("#name")
+        self.review_email_input = self.review_form.locator("#email")
+        self.review_text_input = self.review_form.locator("#review")
+        self.review_submit_button = self.review_form.locator(
+            "#button-review")
+        self.review_success_message = page.get_by_text(
+            "Thank you for your review.", exact=True)
+        self.recommended_items = page.locator(".recommended_items")
+        self.recommended_product_cards = page.locator(
+            ".recommended_items .product-image-wrapper:visible")
+
         self.product_information = page.locator(".product-information")
         self.product_name = self.product_information.locator("h2")
         self.product_category = self.product_information.locator(
@@ -72,3 +98,46 @@ class ProductsPage(BasePage):
     @allure.step("View cart from add-to-cart modal")
     def view_cart_from_modal(self):
         self.click_with_retry_on_overload(self.view_cart_button)
+
+    @allure.step("Expand Women category")
+    def expand_women_category(self):
+        self.click_with_retry_on_overload(self.women_category)
+
+    @allure.step("Open Women subcategory: {subcategory}")
+    def click_women_subcategory(self, subcategory: str):
+        self.click_with_retry_on_overload(
+            self.women_subcategories.get_by_role(
+                "link", name=subcategory, exact=True))
+
+    @allure.step("Expand Men category")
+    def expand_men_category(self):
+        self.click_with_retry_on_overload(self.men_category)
+
+    @allure.step("Open Men subcategory: {subcategory}")
+    def click_men_subcategory(self, subcategory: str):
+        self.click_with_retry_on_overload(
+            self.men_subcategories.get_by_role(
+                "link", name=subcategory, exact=True))
+
+    @allure.step("Open brand at index {index}")
+    def click_brand(self, index: int):
+        self.click_with_retry_on_overload(
+            self.brand_links.nth(index))
+
+    @allure.step("Fill product review form")
+    def fill_review_form(self, name: str, email: str, review: str):
+        self.review_name_input.fill(name)
+        self.review_email_input.fill(email)
+        self.review_text_input.fill(review)
+
+    @allure.step("Submit product review")
+    def submit_review(self):
+        self.click_with_retry_on_overload(self.review_submit_button)
+
+    @allure.step("Add recommended product {index} to cart")
+    def add_recommended_product_to_cart(self, index: int = 0):
+        product_card = self.recommended_product_cards.nth(index)
+        product_card.scroll_into_view_if_needed()
+        product_card.hover()
+        self.click_with_retry_on_overload(
+            product_card.locator("a.add-to-cart").last)
