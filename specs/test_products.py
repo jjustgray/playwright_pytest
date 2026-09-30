@@ -55,9 +55,11 @@ class TestProducts:
     @allure.story("TC-18: View Category Products")
     def test_view_category_products(
         self,
+        main_page: MainPage,
         products_page: ProductsPage,
         page: Page,
     ):
+        main_page.click_products_button()
         expect(products_page.category_sidebar).to_be_visible()
         expect(products_page.women_category).to_be_visible()
         expect(products_page.men_category).to_be_visible()
@@ -86,16 +88,20 @@ class TestProducts:
         expect(products_page.brands_sidebar).to_be_visible()
         expect(products_page.brand_links).not_to_have_count(0)
 
-        first_brand = products_page.brand_links.nth(
-            0).inner_text().splitlines()[-1].strip()
+        def get_brand_name(index: int) -> str:
+            text = products_page.brand_links.nth(index).inner_text()
+            text = text.splitlines(
+            )[-1].strip() if "\n" in text else text.strip()
+            return re.sub(r"^\(\d+\)\s*", "", text)
+
+        first_brand = get_brand_name(0)
         products_page.click_brand(0)
         expect(page).to_have_url(re.compile(r".*/brand_products/.+/?$"))
         expect(products_page.brand_products_heading).to_contain_text(
             re.compile(rf"Brand\s*-\s*{re.escape(first_brand)} Products", re.I))
         expect(products_page.product_cards.first).to_be_visible()
 
-        second_brand = products_page.brand_links.nth(
-            1).inner_text().splitlines()[-1].strip()
+        second_brand = get_brand_name(1)
         products_page.click_brand(1)
         expect(page).to_have_url(re.compile(r".*/brand_products/.+/?$"))
         expect(products_page.brand_products_heading).to_contain_text(

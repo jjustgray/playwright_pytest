@@ -15,6 +15,10 @@ class PaymentPage(BasePage):
         self.pay_button = page.locator('[data-qa="pay-button"]')
         self.order_success_message = page.get_by_text(
             "Congratulations! Your order has been confirmed!", exact=True)
+        self.download_invoice_button = page.get_by_role(
+            "link", name="Download Invoice", exact=True)
+        self.continue_button = page.locator(
+            'a[data-qa="continue-button"]')
 
     @allure.step("Enter payment details")
     def fill_payment_details(self, payment_data: dict):
@@ -23,7 +27,20 @@ class PaymentPage(BasePage):
         self.cvc_input.fill(payment_data["cvc"])
         self.expiry_month_input.fill(payment_data["expiry_month"])
         self.expiry_year_input.fill(payment_data["expiry_year"])
+        self.attach_step_screenshot("payment: details entered")
 
     @allure.step("Pay and confirm order")
     def pay_and_confirm_order(self):
         self.click_with_retry_on_overload(self.pay_button)
+        self.attach_step_screenshot("payment: pay and confirm clicked")
+
+    @allure.step("Download invoice")
+    def download_invoice(self):
+        with self.page.expect_download() as download_info:
+            self.click_with_retry_on_overload(self.download_invoice_button)
+        self.attach_step_screenshot("payment: invoice downloaded")
+        return download_info.value
+
+    @allure.step("Continue after order completion")
+    def click_continue_button(self):
+        self.click_with_retry_on_overload(self.continue_button)

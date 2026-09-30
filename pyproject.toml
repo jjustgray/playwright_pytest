@@ -1,6 +1,6 @@
 [tool.poe.tasks]
-# Run all tests in headless mode with 4 parallel workers
-test = "pytest -n 4 --alluredir=allure-results"
+# Run all tests in headless mode
+test = "pytest --alluredir=allure-results"
 
 # Run tests with browser UI enabled (Headed mode)
 test-headed = "pytest --headed --slowmo 500 --alluredir=allure-results"

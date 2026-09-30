@@ -17,7 +17,9 @@ class CheckoutPage(BasePage):
     @allure.step("Enter order comment")
     def enter_comment(self, comment: str):
         self.comment_input.fill(comment)
+        self.attach_step_screenshot("checkout: comment entered")
 
     @allure.step("Place order")
     def place_order(self):
         self.click_with_retry_on_overload(self.place_order_button)
+        self.attach_step_screenshot("checkout: place order clicked")

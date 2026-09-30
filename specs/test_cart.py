@@ -114,10 +114,12 @@ class TestCart:
             if index < product_count - 1:
                 products_page.continue_shopping()
 
-        products_page.view_cart_from_modal()
+        products_page.continue_shopping()
+        main_page.click_cart_button()
         expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
         expect(cart_page.product_rows).to_have_count(product_count)
-        expect(cart_page.product_rows.first).to_be_visible()
+        for row in cart_page.product_rows.all():
+            expect(row).to_be_visible()
 
         main_page.click_signup_login_button()
         expect(login_page.login_heading).to_be_visible()
@@ -131,15 +133,19 @@ class TestCart:
         main_page.click_cart_button()
         expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
         expect(cart_page.product_rows).to_have_count(product_count)
-        expect(cart_page.product_rows.first).to_be_visible()
+        for row in cart_page.product_rows.all():
+            expect(row).to_be_visible()
 
     @allure.story("TC-22: Add to Cart from Recommended Items")
     def test_add_recommended_product_to_cart(
         self,
+        main_page: MainPage,
         products_page: ProductsPage,
         cart_page: CartPage,
         page: Page,
     ):
+        expect(main_page.slider_section).to_be_visible()
+        products_page.scroll_to_recommended_items()
         expect(products_page.recommended_items).to_be_visible()
         expect(products_page.recommended_product_cards.first).to_be_visible()
 

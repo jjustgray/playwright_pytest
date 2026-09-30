@@ -1,10 +1,23 @@
 import time
-from playwright.sync_api import Page, Locator, expect
+
+import allure
+from playwright.sync_api import Page, Locator
 
 
 class BasePage:
     def __init__(self, page: Page):
         self.page = page
+
+    def attach_step_screenshot(self, step_name: str):
+        try:
+            screenshot = self.page.screenshot(full_page=True)
+            allure.attach(
+                screenshot,
+                name=step_name,
+                attachment_type=allure.attachment_type.PNG,
+            )
+        except Exception:
+            pass
 
     def open(self, url: str):
         self.page.goto(url)
@@ -28,3 +41,4 @@ class BasePage:
                         "The website is under heavy load and did not recover after several attempts.")
             else:
                 break
+        self.attach_step_screenshot(f"step: click on {locator}")

@@ -8,13 +8,15 @@ class SignupPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.signup_heading = page.get_by_role(
-            "heading", 
+            "heading",
             name=re.compile(r"^enter account information$", re.I)
         )
 
         # Account Information Form Locators
-        self.title_group = page.locator(".clearfix", has=page.locator('[data-qa="title"]'))
-        self.title_radio_buttons = self.title_group.locator('input[type="radio"]')
+        self.title_group = page.locator(
+            ".clearfix", has=page.locator('[data-qa="title"]'))
+        self.title_radio_buttons = self.title_group.locator(
+            'input[type="radio"]')
         self.name_input = page.locator('input#name')
         self.email_input = page.locator('input#email')
         self.password_input = page.locator('input#password')
@@ -37,7 +39,8 @@ class SignupPage(BasePage):
         self.zipcode_input = page.locator('input#zipcode')
         self.mobile_number_input = page.locator('input#mobile_number')
 
-        self.create_account_button = page.locator('button[data-qa="create-account"]')
+        self.create_account_button = page.locator(
+            'button[data-qa="create-account"]')
 
         self.account_created_heading = page.get_by_role(
             "heading",
@@ -58,14 +61,17 @@ class SignupPage(BasePage):
         self.day_select.select_option(str(data["day"]))
         self.month_select.select_option(str(data["month"]))
         self.year_select.select_option(str(data["year"]))
+        self.attach_step_screenshot("signup: fill account info")
 
     @allure.step("Click Newsletter Checkbox")
     def click_newsletter_checkbox(self):
         self.newsletter_checkbox.check()
+        self.attach_step_screenshot("signup: newsletter checkbox")
 
     @allure.step("Click Offers Checkbox")
     def click_offers_checkbox(self):
         self.offers_checkbox.check()
+        self.attach_step_screenshot("signup: offers checkbox")
 
     @allure.step("Fill Address Information Form on Signup Page")
     def fill_address_form(self, address_data: dict):
@@ -79,6 +85,7 @@ class SignupPage(BasePage):
         self.city_input.fill(address_data["city"])
         self.zipcode_input.fill(address_data["zipcode"])
         self.mobile_number_input.fill(address_data["mobile_number"])
+        self.attach_step_screenshot("signup: fill address info")
 
     @allure.step("Click Create Account Button")
     def click_create_account_button(self):

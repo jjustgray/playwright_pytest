@@ -38,11 +38,13 @@ class LoginPage(BasePage):
     def fill_signup_form(self, name: str, email: str):
         self.name_input.fill(name)
         self.email_input.fill(email)
+        self.attach_step_screenshot("login: fill signup form")
 
     @allure.step("Fill Login Form on Login Page")
     def fill_login_form(self, email: str, password: str):
         self.login_email_input.fill(email)
         self.login_password_input.fill(password)
+        self.attach_step_screenshot("login: fill login form")
 
     @allure.step("Click Signup Button")
     def click_signup_button(self):

@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 import allure
 from playwright.sync_api import Page, expect
@@ -10,69 +11,11 @@ from pages.main_page import MainPage
 from pages.payment_page import PaymentPage
 from pages.products_page import ProductsPage
 from pages.signup_page import SignupPage
-
-
-PAYMENT_DATA = {
-    "name": "Test Shopper",
-    "card_number": "4111111111111111",
-    "cvc": "123",
-    "expiry_month": "12",
-    "expiry_year": "2030",
-}
-
-
-def _add_two_products_to_cart(
-    main_page: MainPage,
-    products_page: ProductsPage,
-    cart_page: CartPage,
-    page: Page,
-):
-    main_page.click_products_button()
-    products_page.add_product_to_cart(0)
-    products_page.continue_shopping()
-    products_page.add_product_to_cart(1)
-    products_page.continue_shopping()
-    main_page.click_cart_button()
-    expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
-    expect(cart_page.product_rows).to_have_count(2)
-
-
-def _register_user(
-    main_page: MainPage,
-    login_page: LoginPage,
-    signup_page: SignupPage,
-    user_data: dict,
-):
-    expect(login_page.signup_heading).to_be_visible()
-    login_page.fill_signup_form(user_data["name"], user_data["email"])
-    login_page.click_signup_button()
-    expect(signup_page.signup_heading).to_be_visible()
-    signup_page.fill_account_form(user_data)
-    signup_page.fill_address_form(user_data)
-    signup_page.click_create_account_button()
-    expect(signup_page.account_created_heading).to_be_visible()
-    signup_page.click_continue_button()
-    expect(main_page.logged_in_as_text).to_contain_text(
-        f"Logged in as {user_data['name']}")
-
-
-def _complete_order(
-    checkout_page: CheckoutPage,
-    payment_page: PaymentPage,
-    page: Page,
-):
-    expect(page).to_have_url(re.compile(r".*/checkout/?$"))
-    expect(checkout_page.delivery_address).to_be_visible()
-    expect(checkout_page.invoice_address).to_be_visible()
-    expect(checkout_page.order_review).to_be_visible()
-    checkout_page.enter_comment("Please deliver my order carefully.")
-    checkout_page.place_order()
-
-    expect(page).to_have_url(re.compile(r".*/payment/?$"))
-    payment_page.fill_payment_details(PAYMENT_DATA)
-    payment_page.pay_and_confirm_order()
-    expect(payment_page.order_success_message).to_contain_text(
-        "Congratulations! Your order has been confirmed!")
+from specs.fixtures.checkout_helpers import (
+    _add_two_products_to_cart,
+    _complete_order,
+    _register_user,
+)
 
 
 @allure.feature("Checkout")
@@ -159,6 +102,83 @@ class TestCheckout:
         cart_page.proceed_to_checkout()
         _complete_order(checkout_page, payment_page, page)
 
+        main_page.click_delete_account_button()
+        expect(main_page.deleted_account_heading).to_be_visible()
+        signup_page.click_continue_button()
+
+    @allure.story("TC-23: Verify Address Details in Checkout Page")
+    def test_address_details_in_checkout(
+        self,
+        main_page: MainPage,
+        products_page: ProductsPage,
+        cart_page: CartPage,
+        checkout_page: CheckoutPage,
+        login_page: LoginPage,
+        signup_page: SignupPage,
+        order_user_data: dict,
+        page: Page,
+    ):
+        expect(main_page.slider_section).to_be_visible()
+        main_page.click_signup_login_button()
+        _register_user(main_page, login_page, signup_page, order_user_data)
+        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        cart_page.proceed_to_checkout()
+
+        expect(page).to_have_url(re.compile(r".*/checkout/?$"))
+        for address in (
+            checkout_page.delivery_address,
+            checkout_page.invoice_address,
+        ):
+            address_text = address.inner_text()
+            for field in (
+                "first_name",
+                "last_name",
+                "company",
+                "address1",
+                "address2",
+                "city",
+                "state",
+                "zipcode",
+                "country",
+                "mobile_number",
+            ):
+                assert order_user_data[field] in address_text
+
+        main_page.click_delete_account_button()
+        expect(main_page.deleted_account_heading).to_be_visible()
+        signup_page.click_continue_button()
+
+    @allure.story("TC-24: Download Invoice after Purchase Order")
+    def test_download_invoice_after_purchase(
+        self,
+        main_page: MainPage,
+        products_page: ProductsPage,
+        cart_page: CartPage,
+        checkout_page: CheckoutPage,
+        payment_page: PaymentPage,
+        login_page: LoginPage,
+        signup_page: SignupPage,
+        order_user_data: dict,
+        page: Page,
+    ):
+        expect(main_page.slider_section).to_be_visible()
+        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        cart_page.proceed_to_checkout()
+        expect(cart_page.register_login_button).to_be_visible()
+        cart_page.click_register_login()
+
+        _register_user(main_page, login_page, signup_page, order_user_data)
+        main_page.click_cart_button()
+        cart_page.proceed_to_checkout()
+        _complete_order(checkout_page, payment_page, page)
+
+        invoice = payment_page.download_invoice()
+        assert invoice.failure() is None
+        invoice_path = invoice.path()
+        assert invoice_path is not None
+        assert Path(invoice_path).is_file()
+
+        payment_page.click_continue_button()
         main_page.click_delete_account_button()
         expect(main_page.deleted_account_heading).to_be_visible()
         signup_page.click_continue_button()

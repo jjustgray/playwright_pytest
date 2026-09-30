@@ -1,4 +1,7 @@
 import os
+import re
+import uuid
+
 import allure
 from playwright.sync_api import expect, Page
 
@@ -17,12 +20,14 @@ class TestContactUs:
         page: Page
     ):
         file_path = os.path.abspath("specs/fixtures/sample_file.txt")
+        unique_email = f"tempuser_{uuid.uuid4().hex[:8]}@example.com"
         expect(main_page.slider_section).to_be_visible()
         main_page.click_contactus_button()
+        expect(page).to_have_url(re.compile(r".*/contact_us/?$"))
         expect(contactus_page.getintouch_heading).to_be_visible()
         contactus_page.fill_form({
             "name": "Temp User",
-            "email": "tempuser@example.com",
+            "email": unique_email,
             "subject": "Testing",
             "message": "I m testing Contact Us form"
         })
@@ -30,4 +35,5 @@ class TestContactUs:
         contactus_page.click_submit_button()
         expect(contactus_page.success_message).to_be_visible()
         main_page.click_home_button()
+        expect(page).to_have_url(re.compile(r".*/?$"))
         expect(main_page.slider_section).to_be_visible()

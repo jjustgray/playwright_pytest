@@ -27,15 +27,20 @@ class CartPage(BasePage):
     def remove_product(self, product_id: int):
         self.click_with_retry_on_overload(
             self.product_row(product_id).locator(".cart_quantity_delete"))
+        self.attach_step_screenshot(f"cart: removed product {product_id}")
 
     @allure.step("Proceed to checkout")
     def proceed_to_checkout(self):
         self.click_with_retry_on_overload(self.proceed_to_checkout_button)
+        self.attach_step_screenshot("cart: proceed to checkout")
 
     @allure.step("Continue on cart after guest checkout prompt")
     def continue_on_cart(self):
         self.click_with_retry_on_overload(self.continue_on_cart_button)
+        self.attach_step_screenshot("cart: continue on cart")
 
     @allure.step("Open registration and login from checkout prompt")
     def click_register_login(self):
         self.click_with_retry_on_overload(self.register_login_button)
+        self.attach_step_screenshot(
+            "cart: register/login from checkout prompt")

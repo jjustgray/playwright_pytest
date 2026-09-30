@@ -44,6 +44,12 @@ class MainPage(BasePage):
         self.subscribe_button = page.locator("#footer #subscribe")
         self.subscription_success_message = page.locator(
             "#footer #success-subscribe")
+        self.scroll_up_button = page.locator("#scrollUp")
+        self.homepage_heading = self.slider_section.get_by_role(
+            "heading",
+            name=re.compile(
+                r"Full-Fledged practice website for Automation Engineers", re.I),
+        ).first
 
     @allure.step("Click on Signup / Login button")
     def click_signup_login_button(self):
@@ -53,6 +59,8 @@ class MainPage(BasePage):
     def close_ad_position_box(self):
         if self.ad_position_box.is_visible():
             self.click_with_retry_on_overload(self.ad_close_button)
+        else:
+            self.attach_step_screenshot("main: ad position box not present")
 
     @allure.step("Click on Delete Account button")
     def click_delete_account_button(self):
@@ -77,16 +85,39 @@ class MainPage(BasePage):
     @allure.step("Click on Products button")
     def click_products_button(self):
         self.click_with_retry_on_overload(self.products_button)
+        self.page.wait_for_url(re.compile(r".*/products/?$"), timeout=20000)
 
     @allure.step("Click on Cart button")
     def click_cart_button(self):
         self.click_with_retry_on_overload(self.cart_button)
+        self.attach_step_screenshot("main: cart opened")
 
     @allure.step("Scroll to subscription in footer")
     def scroll_to_subscription(self):
         self.subscription_heading.scroll_into_view_if_needed()
+        self.attach_step_screenshot("main: subscription section visible")
+
+    @allure.step("Scroll down to the bottom of the home page")
+    def scroll_to_page_bottom(self):
+        page_height = self.page.locator("body").evaluate(
+            "element => element.scrollHeight")
+        self.page.mouse.wheel(0, page_height)
+        self.subscription_heading.scroll_into_view_if_needed()
+        self.attach_step_screenshot("main: page scrolled to bottom")
+
+    @allure.step("Click scroll-up arrow")
+    def click_scroll_up_button(self):
+        self.click_with_retry_on_overload(self.scroll_up_button)
+
+    @allure.step("Scroll to the top of the home page")
+    def scroll_to_page_top(self):
+        page_height = self.page.locator("body").evaluate(
+            "element => element.scrollHeight")
+        self.page.mouse.wheel(0, -page_height)
+        self.attach_step_screenshot("main: page scrolled to top")
 
     @allure.step("Subscribe to newsletter")
     def subscribe_to_newsletter(self, email: str):
         self.subscription_email_input.fill(email)
         self.click_with_retry_on_overload(self.subscribe_button)
+        self.attach_step_screenshot("main: newsletter subscribed")

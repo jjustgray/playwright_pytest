@@ -70,11 +70,16 @@ class ProductsPage(BasePage):
     @allure.step("Click View Product for the first product")
     def click_first_view_product(self):
         self.click_with_retry_on_overload(self.first_view_product_button)
+        self.attach_step_screenshot("products: view first product")
 
     @allure.step("Search for product: {product_name}")
     def search_product(self, product_name: str):
         self.search_input.fill(product_name)
         self.click_with_retry_on_overload(self.search_button)
+        self.page.wait_for_url(re.compile(
+            r".*/products\?search=.*"), timeout=20000)
+        self.page.wait_for_load_state("networkidle")
+        self.attach_step_screenshot("products: search result")
 
     @allure.step("Add product {index} to cart")
     def add_product_to_cart(self, index: int):
@@ -82,57 +87,71 @@ class ProductsPage(BasePage):
         product_card.hover()
         self.click_with_retry_on_overload(
             product_card.locator("a.add-to-cart").last)
+        self.attach_step_screenshot(f"products: add product {index} to cart")
 
     @allure.step("Set product quantity to {quantity}")
     def set_quantity(self, quantity: int):
         self.quantity_input.fill(str(quantity))
+        self.attach_step_screenshot(f"products: set quantity {quantity}")
 
     @allure.step("Add product details to cart")
     def add_product_details_to_cart(self):
         self.click_with_retry_on_overload(self.detail_add_to_cart_button)
+        self.attach_step_screenshot("products: add product details to cart")
 
     @allure.step("Continue shopping")
     def continue_shopping(self):
         self.click_with_retry_on_overload(self.continue_shopping_button)
+        self.attach_step_screenshot("products: continue shopping")
 
     @allure.step("View cart from add-to-cart modal")
     def view_cart_from_modal(self):
         self.click_with_retry_on_overload(self.view_cart_button)
+        self.attach_step_screenshot("products: view cart")
 
     @allure.step("Expand Women category")
     def expand_women_category(self):
         self.click_with_retry_on_overload(self.women_category)
+        self.attach_step_screenshot("products: expand women category")
 
     @allure.step("Open Women subcategory: {subcategory}")
     def click_women_subcategory(self, subcategory: str):
         self.click_with_retry_on_overload(
             self.women_subcategories.get_by_role(
                 "link", name=subcategory, exact=True))
+        self.attach_step_screenshot(
+            f"products: open women subcategory {subcategory}")
 
     @allure.step("Expand Men category")
     def expand_men_category(self):
         self.click_with_retry_on_overload(self.men_category)
+        self.attach_step_screenshot("products: expand men category")
 
     @allure.step("Open Men subcategory: {subcategory}")
     def click_men_subcategory(self, subcategory: str):
         self.click_with_retry_on_overload(
             self.men_subcategories.get_by_role(
                 "link", name=subcategory, exact=True))
+        self.attach_step_screenshot(
+            f"products: open men subcategory {subcategory}")
 
     @allure.step("Open brand at index {index}")
     def click_brand(self, index: int):
         self.click_with_retry_on_overload(
             self.brand_links.nth(index))
+        self.attach_step_screenshot(f"products: open brand index {index}")
 
     @allure.step("Fill product review form")
     def fill_review_form(self, name: str, email: str, review: str):
         self.review_name_input.fill(name)
         self.review_email_input.fill(email)
         self.review_text_input.fill(review)
+        self.attach_step_screenshot("products: review form filled")
 
     @allure.step("Submit product review")
     def submit_review(self):
         self.click_with_retry_on_overload(self.review_submit_button)
+        self.attach_step_screenshot("products: submit review")
 
     @allure.step("Add recommended product {index} to cart")
     def add_recommended_product_to_cart(self, index: int = 0):
@@ -141,3 +160,10 @@ class ProductsPage(BasePage):
         product_card.hover()
         self.click_with_retry_on_overload(
             product_card.locator("a.add-to-cart").last)
+        self.attach_step_screenshot(
+            f"products: add recommended product {index}")
+
+    @allure.step("Scroll to Recommended Items")
+    def scroll_to_recommended_items(self):
+        self.recommended_items.scroll_into_view_if_needed()
+        self.attach_step_screenshot("products: recommended items visible")

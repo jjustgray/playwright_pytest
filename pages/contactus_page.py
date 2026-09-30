@@ -1,3 +1,5 @@
+import re
+
 import allure
 from playwright.sync_api import Page
 from pages.base_page import BasePage
@@ -17,9 +19,10 @@ class ContactUsPage(BasePage):
         self.message_input = page.locator(
             'form[action="/contact_us"]').get_by_role("textbox", name="message")
         self.file_upload_input = page.locator('input[name="upload_file"]')
-        self.submit_button = page.get_by_role('button', name="submit")
-        self.success_message = page.locator(
-            "#contact-page").get_by_text("Success! Your details have")
+        self.submit_button = page.locator(
+            'form[action="/contact_us"] input[type="submit"][name="submit"]')
+        self.success_message = page.locator("#contact-page").get_by_text(
+            re.compile(r"Success! Your details have", re.I))
 
     @allure.step("Fill Get In Touch form")
     def fill_form(self, user_data: dict):
@@ -27,10 +30,12 @@ class ContactUsPage(BasePage):
         self.email_input.fill(user_data["email"])
         self.subject_input.fill(user_data["subject"])
         self.message_input.fill(user_data["message"])
+        self.attach_step_screenshot("contact: form filled")
 
     @allure.step("Upload file to form")
     def upload_file(self, file_path: str):
         self.file_upload_input.set_input_files(file_path)
+        self.attach_step_screenshot("contact: file uploaded")
 
     @allure.step("Click Submit Button")
     def click_submit_button(self):
@@ -45,3 +50,4 @@ class ContactUsPage(BasePage):
 
         self.page.once("dialog", handle_dialog)
         self.click_with_retry_on_overload(self.submit_button)
+        self.attach_step_screenshot("contact: submit clicked")
