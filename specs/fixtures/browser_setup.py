@@ -25,6 +25,7 @@ def browser_type_launch_args(browser_type_launch_args, browser_name):
 def browser_context_args(browser_context_args):
     return {
         **browser_context_args,
+        "accept_downloads": True,
         "locale": "en-US",
         "extra_http_headers": {
             "Accept-Language": "en-US,en;q=0.9",
