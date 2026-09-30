@@ -48,7 +48,7 @@ jobs:
 
       - name: Run Pytest Tests via Poe
         run: |
-          poe test-browser --browser ${{ matrix.browser }} --alluredir=allure-results || true
+          poe test-browser --browser ${{ matrix.browser }} --alluredir=allure-results
 
       - name: Upload Allure Results Artifact
         if: always()
@@ -117,6 +117,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           WORKFLOW_STATUS: ${{ needs.test.result }}
+          ALLURE_RESULTS_DIR: allure-results
         run: |
           pip install requests
           python utils/slack_notifier.py
