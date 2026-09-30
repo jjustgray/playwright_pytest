@@ -49,5 +49,5 @@ class ContactUsPage(BasePage):
                         f"Unexpected dialog message: {dialog.message}")
 
         self.page.once("dialog", handle_dialog)
-        self.click_with_retry_on_overload(self.submit_button)
         self.attach_step_screenshot("contact: submit clicked")
+        self.click_with_retry_on_overload(self.submit_button)
