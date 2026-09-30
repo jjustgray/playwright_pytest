@@ -30,13 +30,13 @@ cd playwright_pytest
 2. Set up virtual environment and install dependencies
 post-create: 
 ```
-python -m venv .venv
+python -m venv venv
 
 # Linux/macOS:
-source .venv/bin/activate
+source venv/bin/activate
 
 # Windows (Git Bash):
-source .venv/Scripts/activate
+source venv/Scripts/activate
 
 # Install Python & Node.js packages 
 pip install -r requirements.txt

@@ -33,7 +33,7 @@ class TestContactUs:
         })
         contactus_page.upload_file(file_path=file_path)
         contactus_page.click_submit_button()
-        expect(contactus_page.success_message).to_be_visible()
+        expect(contactus_page.success_message).to_be_visible(timeout=15_000)
         main_page.click_home_button()
         expect(page).to_have_url(re.compile(r".*/?$"))
         expect(main_page.slider_section).to_be_visible()

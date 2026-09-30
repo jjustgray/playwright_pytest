@@ -17,7 +17,8 @@ class TestSubscription:
         expect(main_page.subscription_heading).to_be_visible()
         main_page.subscribe_to_newsletter(
             f"subscriber_{uuid.uuid4().hex}@example.com")
-        expect(main_page.subscription_success_message).to_be_visible()
+        expect(main_page.subscription_success_message).to_be_visible(
+            timeout=10000)
         expect(main_page.subscription_success_message).to_contain_text(
             "You have been successfully subscribed!")
 

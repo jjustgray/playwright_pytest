@@ -111,13 +111,12 @@ class MainPage(BasePage):
 
     @allure.step("Scroll to the top of the home page")
     def scroll_to_page_top(self):
-        page_height = self.page.locator("body").evaluate(
-            "element => element.scrollHeight")
-        self.page.mouse.wheel(0, -page_height)
+        self.page.evaluate("window.scrollTo(0, 0)")
         self.attach_step_screenshot("main: page scrolled to top")
 
     @allure.step("Subscribe to newsletter")
     def subscribe_to_newsletter(self, email: str):
         self.subscription_email_input.fill(email)
+        self.subscription_email_input.press("Enter")
         self.click_with_retry_on_overload(self.subscribe_button)
         self.attach_step_screenshot("main: newsletter subscribed")

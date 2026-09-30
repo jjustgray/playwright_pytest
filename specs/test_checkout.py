@@ -13,7 +13,8 @@ from pages.products_page import ProductsPage
 from pages.signup_page import SignupPage
 from specs.fixtures.checkout_helpers import (
     _add_two_products_to_cart,
-    _complete_order,
+    _pay_for_order,
+    _place_order,
     _register_user,
 )
 
@@ -35,16 +36,31 @@ class TestCheckout:
         page: Page,
     ):
         expect(main_page.slider_section).to_be_visible()
-        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        _add_two_products_to_cart(main_page, products_page)
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(2)
         cart_page.proceed_to_checkout()
         expect(cart_page.register_login_button).to_be_visible()
         cart_page.click_register_login()
 
-        _register_user(main_page, login_page, signup_page, order_user_data)
+        expect(login_page.signup_heading).to_be_visible()
+        _register_user(login_page, signup_page, order_user_data)
+        expect(main_page.logged_in_as_text).to_contain_text(
+            f"Logged in as {order_user_data['name']}"
+        )
         main_page.click_cart_button()
         expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
         cart_page.proceed_to_checkout()
-        _complete_order(checkout_page, payment_page, page)
+        expect(page).to_have_url(re.compile(r".*/checkout/?$"))
+        expect(checkout_page.delivery_address).to_be_visible()
+        expect(checkout_page.invoice_address).to_be_visible()
+        expect(checkout_page.order_review).to_be_visible()
+        _place_order(checkout_page)
+        expect(page).to_have_url(re.compile(r".*/payment/?$"))
+        _pay_for_order(payment_page)
+        expect(payment_page.order_success_message).to_contain_text(
+            "Congratulations! Your order has been confirmed!"
+        )
 
         main_page.click_delete_account_button()
         expect(main_page.deleted_account_heading).to_be_visible()
@@ -65,10 +81,25 @@ class TestCheckout:
     ):
         expect(main_page.slider_section).to_be_visible()
         main_page.click_signup_login_button()
-        _register_user(main_page, login_page, signup_page, order_user_data)
-        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        expect(login_page.signup_heading).to_be_visible()
+        _register_user(login_page, signup_page, order_user_data)
+        expect(main_page.logged_in_as_text).to_contain_text(
+            f"Logged in as {order_user_data['name']}"
+        )
+        _add_two_products_to_cart(main_page, products_page)
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(2)
         cart_page.proceed_to_checkout()
-        _complete_order(checkout_page, payment_page, page)
+        expect(page).to_have_url(re.compile(r".*/checkout/?$"))
+        expect(checkout_page.delivery_address).to_be_visible()
+        expect(checkout_page.invoice_address).to_be_visible()
+        expect(checkout_page.order_review).to_be_visible()
+        _place_order(checkout_page)
+        expect(page).to_have_url(re.compile(r".*/payment/?$"))
+        _pay_for_order(payment_page)
+        expect(payment_page.order_success_message).to_contain_text(
+            "Congratulations! Your order has been confirmed!"
+        )
 
         main_page.click_delete_account_button()
         expect(main_page.deleted_account_heading).to_be_visible()
@@ -98,9 +129,20 @@ class TestCheckout:
         expect(main_page.logged_in_as_text).to_contain_text(
             f"Logged in as {registered_order_user['name']}")
 
-        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        _add_two_products_to_cart(main_page, products_page)
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(2)
         cart_page.proceed_to_checkout()
-        _complete_order(checkout_page, payment_page, page)
+        expect(page).to_have_url(re.compile(r".*/checkout/?$"))
+        expect(checkout_page.delivery_address).to_be_visible()
+        expect(checkout_page.invoice_address).to_be_visible()
+        expect(checkout_page.order_review).to_be_visible()
+        _place_order(checkout_page)
+        expect(page).to_have_url(re.compile(r".*/payment/?$"))
+        _pay_for_order(payment_page)
+        expect(payment_page.order_success_message).to_contain_text(
+            "Congratulations! Your order has been confirmed!"
+        )
 
         main_page.click_delete_account_button()
         expect(main_page.deleted_account_heading).to_be_visible()
@@ -120,8 +162,14 @@ class TestCheckout:
     ):
         expect(main_page.slider_section).to_be_visible()
         main_page.click_signup_login_button()
-        _register_user(main_page, login_page, signup_page, order_user_data)
-        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        expect(login_page.signup_heading).to_be_visible()
+        _register_user(login_page, signup_page, order_user_data)
+        expect(main_page.logged_in_as_text).to_contain_text(
+            f"Logged in as {order_user_data['name']}"
+        )
+        _add_two_products_to_cart(main_page, products_page)
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(2)
         cart_page.proceed_to_checkout()
 
         expect(page).to_have_url(re.compile(r".*/checkout/?$"))
@@ -162,15 +210,30 @@ class TestCheckout:
         page: Page,
     ):
         expect(main_page.slider_section).to_be_visible()
-        _add_two_products_to_cart(main_page, products_page, cart_page, page)
+        _add_two_products_to_cart(main_page, products_page)
+        expect(page).to_have_url(re.compile(r".*/view_cart/?$"))
+        expect(cart_page.product_rows).to_have_count(2)
         cart_page.proceed_to_checkout()
         expect(cart_page.register_login_button).to_be_visible()
         cart_page.click_register_login()
 
-        _register_user(main_page, login_page, signup_page, order_user_data)
+        expect(login_page.signup_heading).to_be_visible()
+        _register_user(login_page, signup_page, order_user_data)
+        expect(main_page.logged_in_as_text).to_contain_text(
+            f"Logged in as {order_user_data['name']}"
+        )
         main_page.click_cart_button()
         cart_page.proceed_to_checkout()
-        _complete_order(checkout_page, payment_page, page)
+        expect(page).to_have_url(re.compile(r".*/checkout/?$"))
+        expect(checkout_page.delivery_address).to_be_visible()
+        expect(checkout_page.invoice_address).to_be_visible()
+        expect(checkout_page.order_review).to_be_visible()
+        _place_order(checkout_page)
+        expect(page).to_have_url(re.compile(r".*/payment/?$"))
+        _pay_for_order(payment_page)
+        expect(payment_page.order_success_message).to_contain_text(
+            "Congratulations! Your order has been confirmed!"
+        )
 
         invoice = payment_page.download_invoice()
         assert invoice.failure() is None
