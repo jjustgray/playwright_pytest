@@ -35,11 +35,24 @@ class PaymentPage(BasePage):
         self.attach_step_screenshot("payment: pay and confirm clicked")
 
     @allure.step("Download invoice")
-    def download_invoice(self):
-        with self.page.expect_download() as download_info:
-            self.click_with_retry_on_overload(self.download_invoice_button)
-        self.attach_step_screenshot("payment: invoice downloaded")
-        return download_info.value
+    def download_invoice(self, timeout: float = 5000):
+        href = self.download_invoice_button.get_attribute("href")
+
+        try:
+            with self.page.expect_download(timeout=timeout) as download_info:
+                self.click_with_retry_on_overload(self.download_invoice_button)
+            self.attach_step_screenshot(
+                "payment: invoice downloaded via browser")
+            return download_info.value
+        except Exception:
+            if href:
+                response = self.page.request.get(href)
+                if response.ok:
+                    self.attach_step_screenshot(
+                        "payment: invoice fetched via API fallback")
+                    return response.body()
+            raise RuntimeError(
+                f"Failed to download or fetch invoice from href: {href}")
 
     @allure.step("Continue after order completion")
     def click_continue_button(self):

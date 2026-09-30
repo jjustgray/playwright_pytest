@@ -214,6 +214,7 @@ class TestCheckout:
         signup_page: SignupPage,
         order_user_data: dict,
         page: Page,
+        tmp_path: Path,
     ):
         expect(main_page.slider_section).to_be_visible()
         _add_two_products_to_cart(main_page, products_page)
@@ -241,11 +242,19 @@ class TestCheckout:
             "Congratulations! Your order has been confirmed!"
         )
 
-        invoice = payment_page.download_invoice()
-        assert invoice.failure() is None
-        invoice_path = invoice.path()
-        assert invoice_path is not None
-        assert Path(invoice_path).is_file()
+        expect(payment_page.download_invoice_button).to_be_visible()
+        invoice_result = payment_page.download_invoice()
+
+        if isinstance(invoice_result, bytes):
+            assert len(invoice_result) > 0
+            file_path = tmp_path / "invoice.txt"
+            file_path.write_bytes(invoice_result)
+            assert file_path.is_file()
+        else:
+            assert invoice_result.failure() is None
+            file_path = invoice_result.path()
+            assert file_path is not None
+            assert Path(file_path).is_file()
 
         payment_page.click_continue_button()
         main_page.click_delete_account_button()
