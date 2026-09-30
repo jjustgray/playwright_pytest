@@ -22,7 +22,7 @@ class ContactUsPage(BasePage):
         self.submit_button = page.locator(
             'form[action="/contact_us"] input[type="submit"][name="submit"]')
         self.success_message = page.locator("#contact-page").get_by_text(
-            re.compile(r"Success! Your details have", re.I))
+            re.compile(r"Success! Your details have been submitted successfully.", re.I))
 
     @allure.step("Fill Get In Touch form")
     def fill_form(self, user_data: dict):
