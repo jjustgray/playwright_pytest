@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 
 import allure
+import pytest
 from playwright.sync_api import Page, expect
 
 from pages.cart_page import CartPage
@@ -22,6 +23,7 @@ from specs.fixtures.checkout_helpers import (
 @allure.feature("Checkout")
 class TestCheckout:
 
+    @pytest.mark.regression
     @allure.story("TC-14: Place Order - Register while Checkout")
     def test_register_while_checkout(
         self,
@@ -66,6 +68,7 @@ class TestCheckout:
         expect(main_page.deleted_account_heading).to_be_visible()
         signup_page.click_continue_button()
 
+    @pytest.mark.regression
     @allure.story("TC-15: Place Order - Register before Checkout")
     def test_register_before_checkout(
         self,
@@ -105,6 +108,7 @@ class TestCheckout:
         expect(main_page.deleted_account_heading).to_be_visible()
         signup_page.click_continue_button()
 
+    @pytest.mark.smoke
     @allure.story("TC-16: Place Order - Login before Checkout")
     def test_login_before_checkout(
         self,
@@ -148,6 +152,7 @@ class TestCheckout:
         expect(main_page.deleted_account_heading).to_be_visible()
         signup_page.click_continue_button()
 
+    @pytest.mark.regression
     @allure.story("TC-23: Verify Address Details in Checkout Page")
     def test_address_details_in_checkout(
         self,
@@ -196,6 +201,7 @@ class TestCheckout:
         expect(main_page.deleted_account_heading).to_be_visible()
         signup_page.click_continue_button()
 
+    @pytest.mark.regression
     @allure.story("TC-24: Download Invoice after Purchase Order")
     def test_download_invoice_after_purchase(
         self,

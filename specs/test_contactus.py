@@ -3,6 +3,7 @@ import re
 import uuid
 
 import allure
+import pytest
 from playwright.sync_api import expect, Page
 
 from pages.main_page import MainPage
@@ -12,6 +13,7 @@ from pages.contactus_page import ContactUsPage
 @allure.feature("Contact Us")
 class TestContactUs:
 
+    @pytest.mark.regression
     @allure.story("TC-06: Contact Us Form")
     def test_contactus_form(
         self,

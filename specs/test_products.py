@@ -1,6 +1,7 @@
 import re
 
 import allure
+import pytest
 from playwright.sync_api import Page, expect
 
 from pages.main_page import MainPage
@@ -10,6 +11,7 @@ from pages.products_page import ProductsPage
 @allure.feature("Products")
 class TestProducts:
 
+    @pytest.mark.smoke
     @allure.story("TC-08: Verify All Products and Product Detail Page")
     def test_all_products_and_product_details(
         self,
@@ -32,6 +34,7 @@ class TestProducts:
         expect(products_page.product_condition).to_be_visible()
         expect(products_page.product_brand).to_be_visible()
 
+    @pytest.mark.regression
     @allure.story("TC-09: Search Product")
     def test_search_product(
         self,
@@ -52,6 +55,7 @@ class TestProducts:
         for product_card in products_page.product_cards.all():
             expect(product_card).to_be_visible()
 
+    @pytest.mark.regression
     @allure.story("TC-18: View Category Products")
     def test_view_category_products(
         self,
@@ -76,6 +80,7 @@ class TestProducts:
         expect(products_page.brand_products_heading).to_contain_text(
             "MEN - TSHIRTS PRODUCTS", ignore_case=True)
 
+    @pytest.mark.regression
     @allure.story("TC-19: View and Cart Brand Products")
     def test_view_brand_products(
         self,
@@ -108,6 +113,7 @@ class TestProducts:
             re.compile(rf"Brand\s*-\s*{re.escape(second_brand)} Products", re.I))
         expect(products_page.product_cards.first).to_be_visible()
 
+    @pytest.mark.regression
     @allure.story("TC-21: Add Review on Product")
     def test_add_review_on_product(
         self,

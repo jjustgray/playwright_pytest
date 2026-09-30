@@ -14,6 +14,7 @@ from pages.signup_page import SignupPage
 class TestLoginSignup:
 
     # @pytest.mark.skip(reason="Skipping this test for now")
+    @pytest.mark.regression
     @allure.story("TC-01: Register User")
     def test_register_user(
         self,
@@ -59,6 +60,7 @@ class TestLoginSignup:
         expect(main_page.deleted_account_heading).to_be_visible()
 
     # @pytest.mark.skip(reason="Skipping this test for now")
+    @pytest.mark.smoke
     @allure.story("TC-02: Login User with correct email and password")
     def test_login_user(
         self,
@@ -76,6 +78,7 @@ class TestLoginSignup:
         expect(main_page.deleted_account_heading).to_be_visible()
 
     # @pytest.mark.skip(reason="Skipping this test for now")
+    @pytest.mark.regression
     @allure.story("TC-03: Login User with incorrect email and password")
     def test_login_user_negative(
         self,
@@ -88,6 +91,7 @@ class TestLoginSignup:
         expect(login_page.login_error_message).to_be_visible()
 
     # @pytest.mark.skip(reason="Skipping this test for now")
+    @pytest.mark.regression
     @allure.story("TC-04: Logout User")
     def test_logout_user(
         self,
@@ -105,6 +109,7 @@ class TestLoginSignup:
         main_page.click_logout_button()
         expect(page).to_have_url(re.compile(r".*/login$"))
 
+    @pytest.mark.regression
     @allure.story("TC-05: Register User with existing email")
     def test_register_with_exist_email(
         self,

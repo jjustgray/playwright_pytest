@@ -14,6 +14,9 @@ test-browser = "pytest --alluredir=allure-results"
 # Run smoke tests only
 test-smoke = "pytest -m smoke --alluredir=allure-results"
 
+# Run regression tests only
+test-regression = "pytest -m regression --alluredir=allure-results"
+
 # Run tests sequentially across all three supported browsers
 test-all-browsers = "pytest --browser chromium --browser firefox --browser webkit --alluredir=allure-results"
 

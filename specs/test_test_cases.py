@@ -1,6 +1,7 @@
 import re
 
 import allure
+import pytest
 from playwright.sync_api import Page, expect
 
 from pages.main_page import MainPage
@@ -10,6 +11,7 @@ from pages.testcases_page import TestCasesPage
 @allure.feature("Test Cases")
 class TestTestCases:
 
+    @pytest.mark.regression
     @allure.story("TC-07: Verify Test Cases Page")
     def test_test_cases_page(
         self,

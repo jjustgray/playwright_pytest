@@ -56,9 +56,12 @@ playwright install --with-deps
 |`poe test-headed` | Run tests with browser UI enabled (Headed mode) |
 |`poe test-file` | Run a specific test file (Usage: poe test-file specs/test_contactus.py) |
 |`poe test-browser` | Run tests in a specific browser (Usage: poe test-browser --browser firefox) |
-|`poe test-smoke` | Run `smoke` tests only |
+|`poe test-smoke` | Run critical-path smoke tests only |
+|`poe test-regression` | Run regression tests only |
 |`poe test-all-browsers` | Run tests sequentially across all three supported browsers |
 |`poe clean` | Clean up report directories, pytest cache, and Python bytecode files |
+
+`smoke` tests are a small set of quick checks for critical user journeys. `regression` tests cover the remaining features, negative cases, and detailed behavior. All tests in this project are end-to-end browser tests; these markers select a run group, not a test level.
 
 ---
 

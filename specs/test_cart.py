@@ -1,6 +1,7 @@
 import re
 
 import allure
+import pytest
 from playwright.sync_api import Page, expect
 
 from pages.cart_page import CartPage
@@ -12,6 +13,7 @@ from pages.products_page import ProductsPage
 @allure.feature("Cart")
 class TestCart:
 
+    @pytest.mark.smoke
     @allure.story("TC-12: Add Products in Cart")
     def test_add_products_to_cart(
         self,
@@ -47,6 +49,7 @@ class TestCart:
         expect(second_product.locator(".cart_total")
                ).to_contain_text("Rs. 400")
 
+    @pytest.mark.regression
     @allure.story("TC-13: Verify Product Quantity in Cart")
     def test_product_quantity_in_cart(
         self,
@@ -68,6 +71,7 @@ class TestCart:
         expect(cart_page.product_row(1).locator(
             ".cart_quantity button")).to_have_text("4")
 
+    @pytest.mark.regression
     @allure.story("TC-17: Remove Products From Cart")
     def test_remove_product_from_cart(
         self,
@@ -89,6 +93,7 @@ class TestCart:
         expect(cart_page.product_row(1)).to_have_count(0)
         expect(cart_page.product_rows).to_have_count(1)
 
+    @pytest.mark.regression
     @allure.story("TC-20: Search Products and Verify Cart After Login")
     def test_search_products_and_verify_cart_after_login(
         self,
@@ -136,6 +141,7 @@ class TestCart:
         for row in cart_page.product_rows.all():
             expect(row).to_be_visible()
 
+    @pytest.mark.regression
     @allure.story("TC-22: Add to Cart from Recommended Items")
     def test_add_recommended_product_to_cart(
         self,
