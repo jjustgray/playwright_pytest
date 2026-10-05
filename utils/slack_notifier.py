@@ -13,14 +13,12 @@ if not webhook_url:
     print("Error: SLACK_WEBHOOK_URL is not provided.")
     exit(1)
 
-# Формирование ссылки на GitHub Pages
 if repository:
     owner, repo_name = repository.split("/")
     gh_pages_url = f"https://{owner}.github.io/{repo_name}/"
 else:
     gh_pages_url = "https://github.com"
 
-# Определение статуса для сообщения
 status_icon = "🟢 Passed" if workflow_status == "success" else "🔴 Failed"
 
 results_directory = Path(os.environ.get(

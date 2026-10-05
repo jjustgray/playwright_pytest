@@ -17,9 +17,10 @@ def start_login_signup_flow(main_page: MainPage, login_page: LoginPage):
 
 @pytest.fixture
 def registered_user():
+    user_name = f"Testuser_{uuid.uuid4().hex[:8]}"
     user_data = {
-        "name": "TestUser",
-        "email": "test_login_user_123@example.com",
+        "name": user_name,
+        "email": f"{user_name.lower()}_{uuid.uuid4().hex}@existing.com",
         "password": "Password123!",
         "title": "Mr",
         "birth_date": "1",
@@ -44,6 +45,14 @@ def registered_user():
     assert response.status_code == 200
 
     yield user_data
+
+    requests.delete(
+        "https://automationexercise.com/api/deleteAccount",
+        data={
+            "email": user_data["email"],
+            "password": user_data["password"]
+        }
+    )
 
 
 @pytest.fixture

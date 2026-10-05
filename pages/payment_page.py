@@ -31,7 +31,7 @@ class PaymentPage(BasePage):
 
     @allure.step("Pay and confirm order")
     def pay_and_confirm_order(self):
-        self.click_with_retry_on_overload(self.pay_button)
+        self.pay_button.click()
         self.attach_step_screenshot("payment: pay and confirm clicked")
 
     @allure.step("Download invoice")

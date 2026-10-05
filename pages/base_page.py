@@ -1,4 +1,5 @@
 import time
+import logging
 
 import allure
 from playwright.sync_api import Page, Locator
@@ -16,8 +17,8 @@ class BasePage:
                 name=step_name,
                 attachment_type=allure.attachment_type.PNG,
             )
-        except Exception:
-            pass
+        except Exception as error:
+            logging.warning(f"Failed to capture failure screenshot: {error}")
 
     def open(self, url: str):
         self.page.goto(url)

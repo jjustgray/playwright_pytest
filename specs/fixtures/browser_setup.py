@@ -1,3 +1,4 @@
+import logging
 import re
 import time
 
@@ -49,7 +50,7 @@ def pytest_runtest_makereport(item, call):
                     attachment_type=allure.attachment_type.PNG,
                 )
             except Exception as error:
-                print(f"Не удалось сделать скриншот: {error}")
+                logging.warning(f"Failed to capture failure screenshot: {error}")
 
 
 @pytest.fixture(autouse=True)

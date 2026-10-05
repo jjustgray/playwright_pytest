@@ -17,8 +17,12 @@ test-smoke = "pytest -m smoke --alluredir=allure-results"
 # Run regression tests only
 test-regression = "pytest -m regression --alluredir=allure-results"
 
-# Run tests sequentially across all three supported browsers
-test-all-browsers = "pytest --browser chromium --browser firefox --browser webkit --alluredir=allure-results"
+# Run tests parallel across all three supported browsers
+test-all-browsers = "pytest -n 3 --browser chromium --browser firefox --browser webkit --alluredir=allure-results"
+
+# Run tests parallel in 4 threads in one browser
+test-parallel = "pytest -n 4 --alluredir=allure-results"
+
 
 # Generate and open Allure report locally using npx
 serve-report = "npx allure serve allure-results < /dev/null"

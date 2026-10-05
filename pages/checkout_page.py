@@ -21,5 +21,5 @@ class CheckoutPage(BasePage):
 
     @allure.step("Place order")
     def place_order(self):
-        self.click_with_retry_on_overload(self.place_order_button)
+        self.place_order_button.click()
         self.attach_step_screenshot("checkout: place order clicked")
